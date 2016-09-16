@@ -1,0 +1,2 @@
+#!/bin/bash
+gunicorn --workers 4 --pythonpath ../ --bind 127.0.0.1:4000 --pid gunicorn.pid --daemon app:app

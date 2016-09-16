@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+# Fix the path - http://stackoverflow.com/a/21784070
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
+
+# Start the app!
+from app import app
+app.run()
