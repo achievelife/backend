@@ -2,7 +2,8 @@ import os
 import thread
 import sys
 
-from flask import Flask, jsonify
+from flask import Flask
+from flask_jsonpify import jsonify
 #from flask.ext.sqlalchemy import SQLAlchemy
 #from flask.ext.bcrypt import Bcrypt
 
