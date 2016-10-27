@@ -4,15 +4,16 @@ import sys
 
 from flask import Flask
 from flask_jsonpify import jsonify
-#from flask.ext.sqlalchemy import SQLAlchemy
-#from flask.ext.bcrypt import Bcrypt
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
-#app.config.from_object('config')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///achievelife.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # Setup extensions
-#bcrypt = Bcrypt(app)
-#db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+db = SQLAlchemy(app)
 
 # Add all the models
 from app import models

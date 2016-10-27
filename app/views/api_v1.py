@@ -1,5 +1,7 @@
 from app import app, respond
+from app.models import User, Score
 from datetime import datetime
+import time
 
 @app.route('/api/v1/ping')
 def v1_ping():
@@ -7,7 +9,9 @@ def v1_ping():
 
 @app.route('/api/v1/getUser')
 def v1_getuser():
-	return respond("SUCCESS", data={'uid': 1, 'username': 'sysop', 'session_id': 'abc123'})
+	user = User.query.filter(User.username == "admin").first()
+
+	return respond("SUCCESS", data={'uid': user.id, 'username': user.username, 'session_id': 'TODO'})
 
 @app.route('/api/v1/friends')
 def v1_friends():
@@ -23,30 +27,22 @@ def v1_nearby():
 
 @app.route('/api/v1/activity/history')
 def v1_activity_history():
+	user = User.query.filter(User.username == "admin").first()
+	scores = Score.query.filter(Score.user == user).all()
+	
+	activities = []
+
+	for score in scores:
+		activities.append({
+			'id': score.id,
+			'name': score.activity.name,
+			'start': time.mktime(score.start.timetuple()),
+			'end': time.mktime(score.end.timetuple()),
+			'points': score.activity.points
+		})
+
 	return respond("SUCCESS", data={
-		'activities': [
-			{
-				'id': 1,
-				'name': 'Sample Name',
-				'start': 1476921600,
-				'end': 1476923400,
-				'points': 500
-			},
-			{
-				'id': 2,
-				'name': 'Sample Name 2',
-				'start': 1477008000,
-				'end': 1477009800,
-				'points': 100
-			},
-			{
-				'id': 3,
-				'name': 'Sample Name 3',
-				'start': 1477094400,
-				'end': 1477096200,
-				'points': 1000
-			},
-		]
+		'activities': activities
 	})
 
 @app.route('/api/v1/activity/complete', methods=['POST'])
