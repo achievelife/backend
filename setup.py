@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import random
+
 from app import bcrypt, db
 from app.models import *
 
@@ -7,33 +10,40 @@ try:
 	db.drop_all()
 	db.create_all()
 
-	# Create the first user
-	hashpw = bcrypt.generate_password_hash("admin")
-	user = User("admin", hashpw)
+	print("AchieveLife\n")
 
-	# Add an activity
-	a1 = Activity("Sample #1", 500)
-	a2 = Activity("Sample #2", 100)
-	a3 = Activity("Sample #3", 1000)
+	# Add activities
+	activities = [
+		Activity("Sample #1", 500),
+		Activity("Sample #2", 1000),
+		Activity("Sample #3", 1500),
+		Activity("Sample #4", 250),
+		Activity("Sample #5", 750),
+		Activity("Sample #6", 500),
+		Activity("Sample #7", 1000),
+		Activity("Sample #8", 500),
+		Activity("Sample #9", 1250),
+		Activity("Sample #10", 500)
+	]
 
-	# Add some completed
-	s1 = Score(user, a1)
-	s2 = Score(user, a2)
-	s3 = Score(user, a3)
+	for a in activities:
+		db.session.add(a)
 
-	db.session.add(user)
+	# Create ~20 users
+	for i in xrange(20):
+		hashpw = bcrypt.generate_password_hash("changeme")
+		user = User("user{}".format(i), hashpw)
+		db.session.add(user)
 
-	db.session.add(a1)
-	db.session.add(a2)
-	db.session.add(a3)
+		print("User: {}".format(user.username))
 
-	db.session.add(s1)
-	db.session.add(s2)
-	db.session.add(s3)
+		for a in activities:
+			if bool(random.getrandbits(1)):
+				print("Completed Activity: {}".format(a.name))
+				db.session.add(Score(user, a))
 
-	db.session.commit()
+		db.session.commit()
 
-	print "AchieveLife\n"
-	print "Username: admin\nPassword: admin\n"
+		print("\n")
 except Exception as e:
-	print "Error: %s" % (e)
+	print("Error: %s" % (e))

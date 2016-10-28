@@ -50,3 +50,4 @@ def check_params(request, params):
 # Grab all the views
 from app.views.main import *
 from app.views.api_v1 import *
+from app.views.admin_v1 import *
