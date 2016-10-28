@@ -43,6 +43,25 @@ class User(db.Model):
 		self.password = password
 		self.create_date = created
 
+	def getSkillPoints(self):
+		# This is literally fire
+		query = "SELECT skills.name, SUM(points) AS points " \
+				"FROM users " \
+				"LEFT JOIN scores ON scores.userID = users.id " \
+				"LEFT JOIN activities ON activities.id = scores.activityID " \
+				"LEFT JOIN skills ON skills.id = activities.skillID " \
+				"WHERE users.id = {} " \
+				"GROUP BY skills.id".format(self.id)
+
+		result = db.engine.execute(query)
+		skills = {}
+
+		for res in result.fetchall():
+			(name, points) = res
+			skills[name] = points
+
+		return skills
+
 class Location(db.Model):
 	__tablename__ = 'locations'
 

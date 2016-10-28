@@ -21,12 +21,14 @@ def v1_admin_getUser(uid):
 	if not user:
 		return respond("Unknown user", code=404)
 
-	return respond("SUCCESS", data={'user': {
+	return_user = {
 		'id': user.id,
 		'username': user.username,
 		'xp': -1,
 		'level': -1,
-		'intelligence': -1,
-		'fitness': -1,
-		'finance': -1,
-	}})
+	}
+
+	for (skill, points) in user.getSkillPoints().iteritems():
+		return_user[skill.lower()] = points
+
+	return respond("SUCCESS", data={'user': return_user})
