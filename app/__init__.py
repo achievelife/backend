@@ -47,6 +47,31 @@ def check_params(request, params):
 	if missing:
 		raise StandardError("You are missing the following paramaters: %s" % ', '.join(missing))
 
+##########################
+# Utility function to    #
+# validate a session     #
+##########################
+def validate_session(session):
+	session = models.Session.query.filter(models.Session.session == session).first()
+
+	if not session:
+		raise StandardError("Invalid or expired session!")
+
+	return session.user
+
+##########################
+# Utility function to    #
+# delete a session       #
+##########################
+def delete_session(session):
+	session = models.Session.query.filter(models.Session.session == session).first()
+
+	if not session:
+		return
+
+	db.session.delete(session)
+	db.session.commit()
+
 # Grab all the views
 from app.views.main import *
 from app.views.api_v1 import *
