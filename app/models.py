@@ -110,8 +110,10 @@ class Session(db.Model):
 
 	session = db.Column(db.String(100), unique=True)
 	time = db.Column(db.DateTime)
+	last_activity = db.Column(db.DateTime)
 
 	def __init__(self, session, user):
 		self.session = session
 		self.user = user
 		self.time = datetime.utcnow()
+		self.last_activity = datetime.utcnow()

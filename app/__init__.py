@@ -62,6 +62,10 @@ def validate_session(session):
 	if not session:
 		raise StandardError("Invalid or expired session!")
 
+	# Update last activity because we're MAGIC
+	session.last_activity = datetime.utcnow()
+	db.session.commit()
+
 	return session.user
 
 ##########################
@@ -80,13 +84,13 @@ def delete_session(session):
 ##########################
 # Clear out all sessions #
 # every 30 minutes that  #
-# are 15 minutes old     #
+# are 24 hours old       #
 ##########################
 @scheduler.scheduled_job('cron', id='cleanup_sessions', second=0, minute=30)
 def cleanup_sessions():
 	print "[CRON] Cleaning up sessions..."
 	try:
-		ago = datetime.utcnow() - timedelta(minutes=15)
+		ago = datetime.utcnow() - timedelta(hours=24)
 
 		num = models.Session.query.filter(models.Session.time < ago).delete()
 		db.session.commit()
@@ -101,9 +105,10 @@ def cleanup_sessions():
 # Grab all the views
 from app.views.main import *
 
-# v1 Admin/API
+# v1 Admin
 from app.views.admin_v1 import admin_v1
 app.register_blueprint(admin_v1, url_prefix='/admin/v1')
 
+# v1 API
 from app.views.api_v1 import api_v1
 app.register_blueprint(api_v1, url_prefix='/api/v1')
