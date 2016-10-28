@@ -2,6 +2,8 @@ import os
 import thread
 import sys
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 from flask import Flask
 from flask_jsonpify import jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -10,6 +12,9 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///achievelife.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+# Setup scheduler
+scheduler = BackgroundScheduler()
 
 # Setup extensions
 bcrypt = Bcrypt(app)
@@ -71,6 +76,27 @@ def delete_session(session):
 
 	db.session.delete(session)
 	db.session.commit()
+
+##########################
+# Clear out all sessions #
+# every 30 minutes that  #
+# are 15 minutes old     #
+##########################
+@scheduler.scheduled_job('cron', id='cleanup_sessions', second=0, minute=30)
+def cleanup_sessions():
+	print "[CRON] Cleaning up sessions..."
+	try:
+		ago = datetime.utcnow() - timedelta(minutes=15)
+
+		num = models.Session.query.filter(models.Session.time < ago).delete()
+		db.session.commit()
+
+		print "[CRON] Cleaned up %d old sessions" % (num)
+	except Exception as e:
+		print e
+		db.session.rollback()
+
+		print "[CRON] Failure - rollback triggered"
 
 # Grab all the views
 from app.views.main import *
