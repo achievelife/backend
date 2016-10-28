@@ -9,7 +9,7 @@ def v1_ping():
 
 @app.route('/api/v1/getUser')
 def v1_getuser():
-	user = User.query.filter(User.username == "admin").first()
+	user = User.query.filter(User.username == "user1").first()
 
 	return respond("SUCCESS", data={'uid': user.id, 'username': user.username, 'session_id': 'TODO'})
 
@@ -27,7 +27,7 @@ def v1_nearby():
 
 @app.route('/api/v1/activity/history')
 def v1_activity_history():
-	user = User.query.filter(User.username == "admin").first()
+	user = User.query.filter(User.username == "user1").first()
 	scores = Score.query.filter(Score.user == user).all()
 	
 	activities = []
@@ -38,7 +38,8 @@ def v1_activity_history():
 			'name': score.activity.name,
 			'start': time.mktime(score.start.timetuple()),
 			'end': time.mktime(score.end.timetuple()),
-			'points': score.activity.points
+			'points': score.activity.points,
+			'skill': score.activity.skill.name
 		})
 
 	return respond("SUCCESS", data={

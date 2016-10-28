@@ -10,10 +10,25 @@ class Activity(db.Model):
 	points = db.Column(db.Integer)
 	required_xp = db.Column(db.Integer)
 
-	def __init__(self, name, points, required_xp=0):
+	""" Link to the skill table """
+	skillID = db.Column(db.Integer, db.ForeignKey('skills.id'))
+	skill = db.relationship('Skill', 
+		backref=db.backref('activities', lazy='dynamic'))
+
+	def __init__(self, name, skill, points, required_xp=0):
 		self.name = name
+		self.skill = skill
 		self.points = points
 		self.required_xp = required_xp
+
+class Skill(db.Model):
+	__tablename__ = 'skills'
+
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(255))
+
+	def __init__(self, name):
+		self.name = name
 
 class User(db.Model):
 	__tablename__ = 'users'
