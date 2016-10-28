@@ -1,12 +1,14 @@
-from app import app, bcrypt, db, check_params, respond, validate_session, delete_session
+from app import bcrypt, db, check_params, respond, validate_session, delete_session
 from app.models import User, Score, Session
 from binascii import hexlify
 from datetime import datetime
-from flask import request
+from flask import Blueprint, request
 from os import urandom
 import time
 
-@app.route('/api/v1/ping', methods=['POST'])
+api_v1 = Blueprint('api_v1', __name__)
+
+@api_v1.route('/ping', methods=['POST'])
 def v1_ping():
 	try:
 		check_params(request, ['session'])
@@ -16,7 +18,7 @@ def v1_ping():
 
 	return respond("PONG", data={'now': datetime.utcnow()})
 
-@app.route('/api/v1/getUser', methods=['POST'])
+@api_v1.route('/getUser', methods=['POST'])
 def v1_getuser():
 	try:
 		check_params(request, ['session'])
@@ -26,7 +28,7 @@ def v1_getuser():
 
 	return respond("SUCCESS", data={'uid': user.id, 'username': user.username})
 
-@app.route('/api/v1/friends', methods=['POST'])
+@api_v1.route('/friends', methods=['POST'])
 def v1_friends():
 	try:
 		check_params(request, ['session'])
@@ -36,7 +38,7 @@ def v1_friends():
 
 	return respond("SUCCESS", data={'friends': []})
 
-@app.route('/api/v1/nearby', methods=['POST'])
+@api_v1.route('/nearby', methods=['POST'])
 def v1_nearby():
 	try:
 		check_params(request, ['session'])
@@ -46,7 +48,7 @@ def v1_nearby():
 
 	return respond("SUCCESS", data={'nearby': [{}]})
 
-@app.route('/api/v1/activity/history', methods=['POST'])
+@api_v1.route('/activity/history', methods=['POST'])
 def v1_activity_history():
 	try:
 		check_params(request, ['session'])
@@ -72,7 +74,7 @@ def v1_activity_history():
 		'activities': activities
 	})
 
-@app.route('/api/v1/activity/complete', methods=['POST'])
+@api_v1.route('/activity/complete', methods=['POST'])
 def v1_activity_complete():
 	try:
 		check_params(request, ['session'])
@@ -82,7 +84,7 @@ def v1_activity_complete():
 
 	return respond("TODO")
 
-@app.route('/api/v1/activity/start', methods=['POST'])
+@api_v1.route('/activity/start', methods=['POST'])
 def v1_activity_start():
 	try:
 		check_params(request, ['session'])
@@ -92,17 +94,17 @@ def v1_activity_start():
 
 	return respond("TODO")
 
-@app.route('/api/v1/activity/end', methods=['POST'])
+@api_v1.route('/activity/end', methods=['POST'])
 def v1_activity_end():
 	try:
 		check_params(request, ['session'])
 		user = validate_session(request.form['session'])
 	except StandardError as e:
 		return respond(str(e), code=400), 400
-	
+
 	return respond("TODO")
 
-@app.route('/api/v1/login', methods=['POST'])
+@api_v1.route('/login', methods=['POST'])
 def v1_login():
 	try:
 		check_params(request, ['user', 'pass'])
@@ -127,7 +129,7 @@ def v1_login():
 
 	return respond("SUCCESS", data={'session': session.session})
 
-@app.route('/api/v1/logout', methods=['POST'])
+@api_v1.route('/logout', methods=['POST'])
 def v1_logout():
 	try:
 		check_params(request, ['session'])

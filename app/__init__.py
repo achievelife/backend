@@ -74,5 +74,10 @@ def delete_session(session):
 
 # Grab all the views
 from app.views.main import *
-from app.views.api_v1 import *
-from app.views.admin_v1 import *
+
+# v1 Admin/API
+from app.views.admin_v1 import admin_v1
+app.register_blueprint(admin_v1, url_prefix='/admin/v1')
+
+from app.views.api_v1 import api_v1
+app.register_blueprint(api_v1, url_prefix='/api/v1')
