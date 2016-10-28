@@ -31,7 +31,7 @@ Simple test to see if a session is still active.  Code will be 200 upon success,
 ### /api/v1/getUser
 **INPUT**: session
 
-**OUTPUT**: message, code, uid, username
+**OUTPUT**: message, code, user
 
 Returns information about the currently logged in user.
 
@@ -90,6 +90,6 @@ Returns all the users (uid, name) as well as a count of the users
 ### /admin/v1/getUser
 **INPUT**: key, uid
 
-**OUTPUT**: message, code, id, username, level, {skills}, xp
+**OUTPUT**: message, code, user
 
 Returns specific information about the user you are requesting information about

@@ -26,7 +26,20 @@ def v1_getuser():
 	except StandardError as e:
 		return respond(str(e), code=400), 400
 
-	return respond("SUCCESS", data={'uid': user.id, 'username': user.username})
+	return_user = {
+		'id': user.id,
+		'username': user.username,
+		'level': -1,
+	}
+
+	xp = 0
+	for (skill, points) in user.getSkillPoints().iteritems():
+		return_user[skill.lower()] = points
+		xp += points
+
+	return_user['xp'] = xp
+
+	return respond("SUCCESS", data={'user': return_user})
 
 @api_v1.route('/friends', methods=['POST'])
 def v1_friends():
