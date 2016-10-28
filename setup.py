@@ -13,28 +13,24 @@ try:
 	print("AchieveLife\n")
 
 	# Add Skills
-	skills = {
-		'intel': Skill("Intelligence"),
-		'fit': Skill("Fitness"),
-		'fin': Skill("Finance")
-	}
-
-	# Add activities
-	activities = [
-		Activity("Sample #1", skills['intel'], 500),
-		Activity("Sample #2", skills['fit'], 1000),
-		Activity("Sample #3", skills['fin'], 1500),
-		Activity("Sample #4", skills['intel'], 250),
-		Activity("Sample #5", skills['fit'], 750),
-		Activity("Sample #6", skills['fin'], 500),
-		Activity("Sample #7", skills['intel'], 1000),
-		Activity("Sample #8", skills['fit'], 500),
-		Activity("Sample #9", skills['fin'], 1250),
-		Activity("Sample #10", skills['intel'], 500)
+	skills = [
+		Skill("Intelligence"),
+		Skill("Fitness"),
+		Skill("Finance")
 	]
 
+	# Add activities
+	activities = []
+	xp_vals = [x * 250 for x in xrange(7)]
+	for i in xrange(6):
+		for skill in skills:
+			activities.append(Activity("Sample #{}".format(len(activities)), skill, random.choice(xp_vals)))
+
 	for a in activities:
+		print("Created activity {} ({})".format(a.name, a.skill.name))
 		db.session.add(a)
+
+	print("\n")
 
 	# Create ~20 users
 	for i in xrange(20):
