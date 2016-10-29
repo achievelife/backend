@@ -1,7 +1,3 @@
-import os
-import thread
-import sys
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
