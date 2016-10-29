@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 from json import dumps
+from math import sqrt
 
 class Activity(db.Model):
 	__tablename__ = 'activities'
@@ -66,7 +67,6 @@ class User(db.Model):
 		return_user = {
 			'id': self.id,
 			'username': self.username,
-			'level': -1,
 		}
 
 		xp = 0
@@ -75,8 +75,14 @@ class User(db.Model):
 			xp += points
 
 		return_user['xp'] = xp
+		return_user['level'] = self.xp2level(xp)
 
 		return return_user
+
+	def xp2level(self, xp, whole=True):
+		level = (0.04 * sqrt(xp))
+
+		return (int(round(level)) if whole else level)
 
 class Location(db.Model):
 	__tablename__ = 'locations'
