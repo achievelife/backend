@@ -42,7 +42,6 @@ def validate_session(session):
 	"""
 	return models.User.query.filter(models.User.id == 1).first()
 
-	"""
 	session = models.Session.query.filter(models.Session.session == session).first()
 
 	if not session:
@@ -53,7 +52,6 @@ def validate_session(session):
 	db.session.commit()
 
 	return session.user
-	"""
 
 ##########################
 # Utility function to    #
