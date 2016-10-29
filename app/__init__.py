@@ -5,8 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///achievelife.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config.from_object('app.config')
 
 # Setup scheduler
 scheduler = BackgroundScheduler()
