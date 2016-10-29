@@ -1,5 +1,5 @@
-from app import respond, check_params
 from app.models import User
+from app.utils import respond, check_params
 from datetime import datetime
 from flask import Blueprint, request
 import time

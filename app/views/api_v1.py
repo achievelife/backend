@@ -1,5 +1,6 @@
-from app import bcrypt, db, check_params, respond, validate_session, delete_session
+from app import bcrypt, db
 from app.models import User, Score, Session
+from app.utils import check_params, respond, validate_session, delete_session
 from binascii import hexlify
 from datetime import datetime
 from flask import Blueprint, request
@@ -57,7 +58,6 @@ def v1_activity_history():
 		return respond(str(e), code=400), 400
 
 	scores = Score.query.filter(Score.user == user).all()
-	
 	activities = []
 
 	for score in scores:
