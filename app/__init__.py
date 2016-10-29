@@ -8,8 +8,10 @@ from flask import Flask
 from flask_jsonpify import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/admin*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///achievelife.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
