@@ -24,7 +24,7 @@ try:
 	xp_vals = [x * 250 for x in xrange(7)]
 	for i in xrange(6):
 		for skill in skills:
-			activities.append(Activity("Sample #{}".format(len(activities)), skill, random.choice(xp_vals)))
+			activities.append(Activity("Sample #{}".format(len(activities)+1), skill, random.choice(xp_vals)))
 
 	for a in activities:
 		print("Created activity {} ({})".format(a.name, a.skill.name))
@@ -35,7 +35,7 @@ try:
 	# Create ~20 users
 	for i in xrange(20):
 		hashpw = bcrypt.generate_password_hash("changeme")
-		user = User("user{}".format(i), hashpw)
+		user = User("user{}".format(i+1), hashpw)
 		db.session.add(user)
 
 		print("User: {}".format(user.username))
