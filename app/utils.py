@@ -36,6 +36,12 @@ def check_params(request, params):
 # validate a session     #
 ##########################
 def validate_session(session):
+	"""
+	Ok, for sprint 3 we're not going to actually validate sessions.  It'll
+	always be good for the first user (user1).  THIS WILL BE REMOVED BY SPRINT 4
+	"""
+	return models.User.query.filter(models.User.id == 1).first()
+
 	session = models.Session.query.filter(models.Session.session == session).first()
 
 	if not session:
