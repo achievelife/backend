@@ -6,10 +6,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/admin*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///achievelife.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
@@ -19,6 +18,9 @@ scheduler = BackgroundScheduler()
 # Setup extensions
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
+
+# Setup CORS
+cors = CORS(app, resources={r'/admin*': {'origins': '*'}})
 
 # Add automated schedules
 from app.scheduler import *
