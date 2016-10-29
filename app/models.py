@@ -62,6 +62,22 @@ class User(db.Model):
 
 		return skills
 
+	def getDict(self):
+		return_user = {
+			'id': self.id,
+			'username': self.username,
+			'level': -1,
+		}
+
+		xp = 0
+		for (skill, points) in self.getSkillPoints().iteritems():
+			return_user[skill.lower()] = points
+			xp += points
+
+		return_user['xp'] = xp
+
+		return return_user
+
 class Location(db.Model):
 	__tablename__ = 'locations'
 

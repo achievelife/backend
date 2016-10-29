@@ -43,17 +43,4 @@ def v1_admin_getUser():
 	if not user:
 		return respond("Unknown user", code=404)
 
-	return_user = {
-		'id': user.id,
-		'username': user.username,
-		'level': -1,
-	}
-
-	xp = 0
-	for (skill, points) in user.getSkillPoints().iteritems():
-		return_user[skill.lower()] = points
-		xp += points
-
-	return_user['xp'] = xp
-
-	return respond("SUCCESS", data={'user': return_user})
+	return respond("SUCCESS", data={'user': user.getDict()})
