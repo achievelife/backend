@@ -1,50 +1,33 @@
-import os
-import thread
-import sys
-
-from flask import Flask, jsonify
-#from flask.ext.sqlalchemy import SQLAlchemy
-#from flask.ext.bcrypt import Bcrypt
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 
 app = Flask(__name__)
-#app.config.from_object('config')
+app.config.from_object('app.config')
+
+# Setup scheduler
+scheduler = BackgroundScheduler()
 
 # Setup extensions
-#bcrypt = Bcrypt(app)
-#db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+db = SQLAlchemy(app)
 
-# Add all the models
-from app import models
+# Setup CORS
+cors = CORS(app, resources={r'/admin*': {'origins': '*'}})
 
-##########################
-# Utility function to    #
-# return a JSON Response #
-##########################
-def respond(message, data={}, code=200):
-	response = {
-		'code': code,
-		'message': message
-	}
-
-	if data:
-		response.update(data)
-
-	return jsonify(response)
-
-##########################
-# Utility function to    #
-# return check all POST  #
-# params                 #
-##########################
-def check_params(request, params):
-	missing = []
-	for param in params:
-		if param not in request.form.keys():
-			missing.append(param)
-
-	if missing:
-		raise StandardError("You are missing the following paramaters: %s" % ', '.join(missing))
+# Add automated schedules
+from app.scheduler import *
 
 # Grab all the views
+## Main view
 from app.views.main import *
-from app.views.api_v1 import *
+
+## v1 Admin
+from app.views.admin_v1 import admin_v1
+app.register_blueprint(admin_v1, url_prefix='/admin/v1')
+
+## v1 API
+from app.views.api_v1 import api_v1
+app.register_blueprint(api_v1, url_prefix='/api/v1')

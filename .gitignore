@@ -7,6 +7,12 @@ __pycache__/
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Database
+app/achievelife.db
+
+# Config
+app/config.py
+
 # Flask stuff:
 instance/
 .webassets-cache
