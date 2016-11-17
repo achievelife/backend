@@ -1,5 +1,5 @@
 from app import bcrypt, db
-from app.models import User, Score, Session, Location
+from app.models import User, Score, Session, Location, Activity
 from app.utils import check_params, respond, validate_session, delete_session
 from binascii import hexlify
 from datetime import datetime
@@ -78,10 +78,19 @@ def v1_location():
 	loc = {
 		'name': location.name,
 		'lat': location.lat,
-		'lng': location.lng
+		'lng': location.lng,
 	}
 
-	return respond("SUCCESS", data={'location': loc})
+	activities = Activity.query.filter(Activity.location == location).all()
+	acts = []
+	for a in activities:
+		acts.append({
+			'name': a.name,
+			'desc': a.desc,
+			'points': a.points
+		})
+
+	return respond("SUCCESS", data={'location': loc, 'activities': acts})
 
 @api_v1.route('/activity/history', methods=['POST'])
 def v1_activity_history():
