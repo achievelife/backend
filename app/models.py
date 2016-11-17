@@ -8,6 +8,7 @@ class Activity(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(255))
+	desc = db.Column(db.String(255))
 	points = db.Column(db.Integer)
 	required_xp = db.Column(db.Integer)
 
@@ -16,9 +17,16 @@ class Activity(db.Model):
 	skill = db.relationship('Skill', 
 		backref=db.backref('activities', lazy='dynamic'))
 
-	def __init__(self, name, skill, points, required_xp=0):
+	""" Link to the location table """
+	locationID = db.Column(db.Integer, db.ForeignKey('locations.id'))
+	location = db.relationship('Location', 
+		backref=db.backref('activities', lazy='dynamic'))
+
+	def __init__(self, name, desc, skill, location, points, required_xp=0):
 		self.name = name
+		self.desc = desc
 		self.skill = skill
+		self.location = location
 		self.points = points
 		self.required_xp = required_xp
 

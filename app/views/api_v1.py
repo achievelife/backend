@@ -1,5 +1,5 @@
 from app import bcrypt, db
-from app.models import User, Score, Session
+from app.models import User, Score, Session, Location
 from app.utils import check_params, respond, validate_session, delete_session
 from binascii import hexlify
 from datetime import datetime
@@ -62,6 +62,26 @@ def v1_nearby():
 		return respond(str(e), code=400), 400
 
 	return respond("SUCCESS", data={'nearby': [{}]})
+
+@api_v1.route('/location', methods=['POST'])
+def v1_location():
+	try:
+		check_params(request, ['session', 'id'])
+		user = validate_session(request.form['session'])
+	except StandardError as e:
+		return respond(str(e), code=400), 400
+
+	location = Location.query.filter(Location.id == request.form['id']).first()
+	if location == None:
+		return respond("Unknown location", code=103), 500
+
+	loc = {
+		'name': location.name,
+		'lat': location.lat,
+		'lng': location.lng
+	}
+
+	return respond("SUCCESS", data={'location': loc})
 
 @api_v1.route('/activity/history', methods=['POST'])
 def v1_activity_history():
