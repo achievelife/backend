@@ -64,7 +64,7 @@ class User(db.Model):
 				"LEFT JOIN scores ON scores.userID = users.id " \
 				"LEFT JOIN activities ON activities.id = scores.activityID " \
 				"LEFT JOIN skills ON skills.id = activities.skillID " \
-				"WHERE users.id = {} " \
+				"WHERE users.id = {} AND scores.completed = 1" \
 				"GROUP BY skills.id".format(self.id)
 
 		result = db.engine.execute(query)
@@ -118,6 +118,7 @@ class Score(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	start = db.Column(db.DateTime)
 	end = db.Column(db.DateTime)
+	completed = db.Column(db.Boolean)
 
 	""" Link to the account table """
 	activityID = db.Column(db.Integer, db.ForeignKey('activities.id'))
@@ -129,11 +130,12 @@ class Score(db.Model):
 	user = db.relationship('User', 
 		backref=db.backref('scores', lazy='dynamic')) #foreign_keys=[activityID])
 
-	def __init__(self, user, activity, start=datetime.utcnow(), end=datetime.utcnow()):
+	def __init__(self, user, activity, start=datetime.utcnow(), end=datetime.utcnow(), completed=False):
 		self.user = user
 		self.activity = activity
 		self.start = start
 		self.end = end
+		self.completed = completed
 
 class Session(db.Model):
 	__tablename__ = 'sessions'

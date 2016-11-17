@@ -52,7 +52,7 @@ try:
 		for a in activities:
 			if bool(random.getrandbits(1)):
 				print("Completed Activity: {} ({})".format(a.name, a.skill.name))
-				db.session.add(Score(user, a))
+				db.session.add(Score(user, a, completed=True))
 
 		db.session.commit()
 
