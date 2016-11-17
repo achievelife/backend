@@ -39,10 +39,15 @@ class User(db.Model):
 	password = db.Column(db.String(255))
 	create_date = db.Column(db.DateTime)
 
-	def __init__(self, username, password, created=datetime.utcnow()):
+	lat = db.Column(db.Float)
+	lng = db.Column(db.Float)
+
+	def __init__(self, username, password, created=datetime.utcnow(), lat=0.0, lng=0.0):
 		self.username = username
 		self.password = password
 		self.create_date = created
+		self.lat = lat
+		self.lng = lng
 
 	def getSkillPoints(self):
 		# This is literally fire

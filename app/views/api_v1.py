@@ -39,6 +39,20 @@ def v1_friends():
 
 	return respond("SUCCESS", data={'friends': []})
 
+@api_v1.route('/checkin', methods=['POST'])
+def v1_checkin():
+	try:
+		check_params(request, ['session', 'lat', 'lng'])
+		user = validate_session(request.form['session'])
+	except StandardError as e:
+		return respond(str(e), code=400), 400
+
+	user.lat = request.form['lat']
+	user.lng = request.form['lng']
+	db.session.commit()
+
+	return respond("SUCCESS")
+
 @api_v1.route('/nearby', methods=['POST'])
 def v1_nearby():
 	try:
