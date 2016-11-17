@@ -64,7 +64,7 @@ class User(db.Model):
 				"LEFT JOIN scores ON scores.userID = users.id " \
 				"LEFT JOIN activities ON activities.id = scores.activityID " \
 				"LEFT JOIN skills ON skills.id = activities.skillID " \
-				"WHERE users.id = {} AND scores.completed = 1" \
+				"WHERE users.id = {} AND scores.completed = 1 " \
 				"GROUP BY skills.id".format(self.id)
 
 		result = db.engine.execute(query)
