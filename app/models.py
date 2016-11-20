@@ -8,6 +8,7 @@ class Activity(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(255))
+	desc = db.Column(db.String(255))
 	points = db.Column(db.Integer)
 	required_xp = db.Column(db.Integer)
 
@@ -16,9 +17,16 @@ class Activity(db.Model):
 	skill = db.relationship('Skill', 
 		backref=db.backref('activities', lazy='dynamic'))
 
-	def __init__(self, name, skill, points, required_xp=0):
+	""" Link to the location table """
+	locationID = db.Column(db.Integer, db.ForeignKey('locations.id'))
+	location = db.relationship('Location', 
+		backref=db.backref('activities', lazy='dynamic'))
+
+	def __init__(self, name, desc, skill, location, points, required_xp=0):
 		self.name = name
+		self.desc = desc
 		self.skill = skill
+		self.location = location
 		self.points = points
 		self.required_xp = required_xp
 
@@ -39,10 +47,15 @@ class User(db.Model):
 	password = db.Column(db.String(255))
 	create_date = db.Column(db.DateTime)
 
-	def __init__(self, username, password, created=datetime.utcnow()):
+	lat = db.Column(db.Float)
+	lng = db.Column(db.Float)
+
+	def __init__(self, username, password, created=datetime.utcnow(), lat=0.0, lng=0.0):
 		self.username = username
 		self.password = password
 		self.create_date = created
+		self.lat = lat
+		self.lng = lng
 
 	def getSkillPoints(self):
 		# This is literally fire
@@ -51,7 +64,7 @@ class User(db.Model):
 				"LEFT JOIN scores ON scores.userID = users.id " \
 				"LEFT JOIN activities ON activities.id = scores.activityID " \
 				"LEFT JOIN skills ON skills.id = activities.skillID " \
-				"WHERE users.id = {} " \
+				"WHERE users.id = {} AND scores.completed = 1 " \
 				"GROUP BY skills.id".format(self.id)
 
 		result = db.engine.execute(query)
@@ -72,6 +85,8 @@ class User(db.Model):
 		xp = 0
 		for (skill, points) in self.getSkillPoints().iteritems():
 			return_user[skill.lower()] = points
+			return_user[skill.lower() + "Level"] = self.xp2level(points)
+
 			xp += points
 
 		return_user['xp'] = xp
@@ -103,6 +118,7 @@ class Score(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	start = db.Column(db.DateTime)
 	end = db.Column(db.DateTime)
+	completed = db.Column(db.Boolean)
 
 	""" Link to the account table """
 	activityID = db.Column(db.Integer, db.ForeignKey('activities.id'))
@@ -114,11 +130,12 @@ class Score(db.Model):
 	user = db.relationship('User', 
 		backref=db.backref('scores', lazy='dynamic')) #foreign_keys=[activityID])
 
-	def __init__(self, user, activity, start=datetime.utcnow(), end=datetime.utcnow()):
+	def __init__(self, user, activity, start=datetime.utcnow(), end=datetime.utcnow(), completed=False):
 		self.user = user
 		self.activity = activity
 		self.start = start
 		self.end = end
+		self.completed = completed
 
 class Session(db.Model):
 	__tablename__ = 'sessions'

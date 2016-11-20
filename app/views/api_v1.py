@@ -1,5 +1,5 @@
 from app import bcrypt, db
-from app.models import User, Score, Session
+from app.models import User, Score, Session, Location, Activity
 from app.utils import check_params, respond, validate_session, delete_session
 from binascii import hexlify
 from datetime import datetime
@@ -39,6 +39,20 @@ def v1_friends():
 
 	return respond("SUCCESS", data={'friends': []})
 
+@api_v1.route('/checkin', methods=['POST'])
+def v1_checkin():
+	try:
+		check_params(request, ['session', 'lat', 'lng'])
+		user = validate_session(request.form['session'])
+	except StandardError as e:
+		return respond(str(e), code=400), 400
+
+	user.lat = request.form['lat']
+	user.lng = request.form['lng']
+	db.session.commit()
+
+	return respond("SUCCESS")
+
 @api_v1.route('/nearby', methods=['POST'])
 def v1_nearby():
 	try:
@@ -48,6 +62,35 @@ def v1_nearby():
 		return respond(str(e), code=400), 400
 
 	return respond("SUCCESS", data={'nearby': [{}]})
+
+@api_v1.route('/location', methods=['POST'])
+def v1_location():
+	try:
+		check_params(request, ['session', 'id'])
+		user = validate_session(request.form['session'])
+	except StandardError as e:
+		return respond(str(e), code=400), 400
+
+	location = Location.query.filter(Location.id == request.form['id']).first()
+	if location == None:
+		return respond("Unknown location", code=103), 500
+
+	loc = {
+		'name': location.name,
+		'lat': location.lat,
+		'lng': location.lng,
+	}
+
+	activities = Activity.query.filter(Activity.location == location).all()
+	acts = []
+	for a in activities:
+		acts.append({
+			'name': a.name,
+			'desc': a.desc,
+			'points': a.points
+		})
+
+	return respond("SUCCESS", data={'location': loc, 'activities': acts})
 
 @api_v1.route('/activity/history', methods=['POST'])
 def v1_activity_history():
@@ -67,7 +110,8 @@ def v1_activity_history():
 			'start': time.mktime(score.start.timetuple()),
 			'end': time.mktime(score.end.timetuple()),
 			'points': score.activity.points,
-			'skill': score.activity.skill.name
+			'skill': score.activity.skill.name,
+			'completed': score.completed
 		})
 
 	return respond("SUCCESS", data={
@@ -77,32 +121,45 @@ def v1_activity_history():
 @api_v1.route('/activity/complete', methods=['POST'])
 def v1_activity_complete():
 	try:
-		check_params(request, ['session'])
+		check_params(request, ['session', 'id'])
 		user = validate_session(request.form['session'])
 	except StandardError as e:
 		return respond(str(e), code=400), 400
 
-	return respond("TODO")
+	score = Score.query.filter(Score.id == request.form['id']).first()
+	if score == None:
+		return respond("Unknown score", code=104), 400
+
+	if score.user.id != user.id:
+		return respond("Stop haxing", code=999), 400
+
+	if score.completed:
+		return respond("Activity already completed!", code=105), 400
+
+	score.end = datetime.utcnow()
+	score.completed = True
+	db.session.commit()
+
+	return respond("Completed!", data={'xp_gained': score.activity.points})
 
 @api_v1.route('/activity/start', methods=['POST'])
 def v1_activity_start():
 	try:
-		check_params(request, ['session'])
+		check_params(request, ['session', 'id'])
 		user = validate_session(request.form['session'])
 	except StandardError as e:
 		return respond(str(e), code=400), 400
 
-	return respond("TODO")
+	activity = Activity.query.filter(Activity.id == request.form['id']).first()
+	if activity == None:
+		return respond("Unknown activity", code=105), 400
 
-@api_v1.route('/activity/end', methods=['POST'])
-def v1_activity_end():
-	try:
-		check_params(request, ['session'])
-		user = validate_session(request.form['session'])
-	except StandardError as e:
-		return respond(str(e), code=400), 400
+	score = Score(user, activity)
 
-	return respond("TODO")
+	db.session.add(score)
+	db.session.commit()
+
+	return respond("Completed!", data={'id': score.id})
 
 @api_v1.route('/login', methods=['POST'])
 def v1_login():
