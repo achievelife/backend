@@ -85,7 +85,7 @@ class User(db.Model):
 		xp = 0
 		for (skill, points) in self.getSkillPoints().iteritems():
 			return_user[skill.lower()] = points
-			return_user[skill.lower() + "Level"] = self.xp2level(points)
+			return_user["{}Level".format(skill.lower())] = self.xp2level(points)
 
 			xp += points
 
