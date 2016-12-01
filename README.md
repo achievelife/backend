@@ -14,6 +14,13 @@ All endpoints EXCEPT for /api/v1/login require the session key to be sent apart 
 
 Logs in a user.  Code will be 200 if the login was successful.  ENSURE YOU KEEP THE SESSION KEY RETURNED.  THIS WILL AUTHENTICATE THE USER FOR ANY OTHER REQUESTS.
 
+### /api/v1/fblogin
+**INPUT**: token
+
+**OUTPUT**: message, code, session
+
+Logs in a user via facebook auth.  Needs a (valid) access token from Facebook.  Code will be 200 if the login was successful.  ENSURE YOU KEEP THE SESSION KEY RETURNED.  THIS WILL AUTHENTICATE THE USER FOR ANY OTHER REQUESTS.
+
 ### /api/v1/logout
 **INPUT**: session
 
@@ -49,6 +56,20 @@ Returns all friends of the current user.
 
 Returns nearby activities.
 
+### /api/v1/checkin
+**INPUT**: session, lat, lng
+
+**OUTPUT**: message, code
+
+Updates the current user's information to the given lat/lng.
+
+### /api/v1/location
+**INPUT**: session, id
+
+**OUTPUT**: message, code, loc, activities
+
+Grabs location information from a location id.
+
 ### /api/v1/activity/history
 **INPUT**: session
 
@@ -57,25 +78,18 @@ Returns nearby activities.
 Returns the entire activity history for the currently logged in user.
 
 ### /api/v1/activity/complete
-**INPUT**: session
+**INPUT**: session, id
 
 **OUTPUT**: message, code
 
-Complete's an activity.
+Complete's an activity.  ID is the id returned from `/api/v1/activity/start`.
 
 ### /api/v1/activity/start
-**INPUT**: session
+**INPUT**: session, id
 
 **OUTPUT**: message, code
 
-Start's an activity.
-
-### /api/v1/activity/end
-**INPUT**: session
-
-**OUTPUT**: message, code
-
-End's an activity.
+Start's an activity.  ID is the Activity ID.
 
 ## Admin v1
 All endpoints require the admin key to be sent, in order to authenticate the request.
