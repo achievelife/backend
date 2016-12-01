@@ -18,6 +18,7 @@ MarkupSafe==0.23
 pycparser==2.16
 python-dateutil==2.6.0
 pytz==2016.7
+requests==2.12.3
 six==1.10.0
 SQLAlchemy==1.1.0
 tzlocal==1.3

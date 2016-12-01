@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import Blueprint, request
 from os import urandom
 import time
+import requests
 
 api_v1 = Blueprint('api_v1', __name__)
 
@@ -174,6 +175,43 @@ def v1_login():
 	user = User.query.filter(User.username == username).first()
 	if user == None or not bcrypt.check_password_hash(user.password, password):
 		return respond("Unknown or invalid username/password", code=400), 400
+
+	# Create a session
+	session = Session(hexlify(urandom(50)), user)
+	try:
+		db.session.add(session)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return respond("Internal server error has occured", code=101), 500
+
+	return respond("SUCCESS", data={'session': session.session})
+
+@api_v1.route('/fblogin', methods=['POST'])
+def v1_fblogin():
+	try:
+		check_params(request, ['token'])
+	except StandardError as e:
+		return respond(str(e), code=400), 400
+
+	token = str(request.form['token'])
+
+	# Create the username
+	fb_url = "https://graph.facebook.com/v2.8/me?fields=id%2Cemail&access_token={}"
+	r = requests.get(fb_url.format(token))
+	data = r.json()
+
+	if r.status_code != 200:
+		return respond("Server failure", code=r.status_code), 500
+
+	user_email = r.json()['email']
+	user = User.query.filter(User.username == user_email).first()
+
+	## Create if does not exist
+	if user == None:
+		user = User(user_email, "")
+		db.session.add(user)
+		db.session.commit()
 
 	# Create a session
 	session = Session(hexlify(urandom(50)), user)

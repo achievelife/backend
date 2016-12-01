@@ -15,7 +15,7 @@ bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 # Setup CORS
-cors = CORS(app, resources={r'/admin*': {'origins': '*'}})
+cors = CORS(app)
 
 # Add automated schedules
 from app.scheduler import *
