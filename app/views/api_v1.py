@@ -197,19 +197,19 @@ def v1_fblogin():
 	token = str(request.form['token'])
 
 	# Create the username
-	fb_url = "https://graph.facebook.com/v2.8/me?fields=id%2Cemail&access_token={}"
+	fb_url = "https://graph.facebook.com/v2.8/me?fields=id&access_token={}"
 	r = requests.get(fb_url.format(token))
 	data = r.json()
 
 	if r.status_code != 200:
 		return respond("Server failure", code=r.status_code), 500
 
-	user_email = r.json()['email']
-	user = User.query.filter(User.username == user_email).first()
+	fb_username = "fb_{}".format(r.json()['id'])
+	user = User.query.filter(User.username == fb_username).first()
 
 	## Create if does not exist
 	if user == None:
-		user = User(user_email, "")
+		user = User(fb_username, "")
 		db.session.add(user)
 		db.session.commit()
 
